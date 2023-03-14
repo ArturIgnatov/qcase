@@ -1,0 +1,97 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+input CreateOrganizationInput {
+  description: String
+  name: String!
+}
+
+input CreateProjectInput {
+  description: String
+  name: String!
+}
+
+input CreateUserInput {
+  email: String!
+  fname: String!
+  lname: String
+  password: String!
+}
+
+type Mutation {
+  createOrganization(createOrgInput: CreateOrganizationInput!): OrganizationEntity!
+  createProject(createProjectInput: CreateProjectInput!): ProjectEntity!
+  createUser(createUser: CreateUserInput!): UserEntity!
+  removeOrganization(id: String!): String!
+  removeProject(id: String!): String!
+  removeUser(id: String!): String!
+  updateOrganization(updateOrgInput: UpdateOrganizationInput!): OrganizationEntity!
+  updateProject(updateProjectInput: UpdateProjectInput!): ProjectEntity!
+  updateUser(updateUser: UpdateUserInput!): UserEntity!
+}
+
+type OrganizationEntity {
+  createdUserId: ID!
+  description: String!
+  id: ID!
+  name: String!
+  projects: [ProjectEntity!]!
+  status: String!
+  users: [UserEntity!]!
+}
+
+type ProjectEntity {
+  createdUserId: String!
+  description: String!
+  id: ID!
+  name: String!
+  organization: OrganizationEntity!
+  organizationId: ID!
+  status: String!
+}
+
+type Query {
+  getOrganization(id: String!): OrganizationEntity!
+  getOrganizations: [OrganizationEntity!]!
+  getProject(id: String!): ProjectEntity!
+  getProjects: [ProjectEntity!]!
+  getUser(id: String!): UserEntity!
+  getUsers: [UserEntity!]!
+}
+
+input UpdateOrganizationInput {
+  description: String
+  id: ID!
+  name: String
+}
+
+input UpdateProjectInput {
+  description: String
+  id: ID!
+  name: String
+}
+
+input UpdateUserInput {
+  fname: String
+  id: ID!
+  lname: String
+  status: String
+}
+
+type UserEntity {
+  email: String!
+  fname: String!
+  id: ID!
+  lname: String!
+  organizations: [OrganizationEntity!]!
+  password: String!
+  role: UserRole!
+}
+
+"""The user supported roles."""
+enum UserRole {
+  ADMIN
+  SUPER_ADMIN
+  USER
+}
