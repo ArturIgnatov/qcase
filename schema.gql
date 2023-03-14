@@ -85,7 +85,6 @@ type UserEntity {
   id: ID!
   lname: String!
   organizations: [OrganizationEntity!]!
-  password: String!
   role: UserRole!
 }
 
