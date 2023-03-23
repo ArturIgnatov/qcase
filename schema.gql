@@ -2,12 +2,26 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type CaseEntity {
+  createdUserId: ID!
+  description: String!
+  id: ID!
+  name: String!
+  templateId: ID!
+}
+
 input CreateOrganizationInput {
   description: String
   name: String!
 }
 
 input CreateProjectInput {
+  description: String
+  name: String!
+  organizationId: String!
+}
+
+input CreateTemplateInput {
   description: String
   name: String!
 }
@@ -22,12 +36,15 @@ input CreateUserInput {
 type Mutation {
   createOrganization(createOrgInput: CreateOrganizationInput!): OrganizationEntity!
   createProject(createProjectInput: CreateProjectInput!): ProjectEntity!
+  createTemplate(createTemplateInput: CreateTemplateInput!): TemplateEntity!
   createUser(createUser: CreateUserInput!): UserEntity!
   removeOrganization(id: String!): String!
   removeProject(id: String!): String!
+  removeTemplate(id: String!): String!
   removeUser(id: String!): String!
   updateOrganization(updateOrgInput: UpdateOrganizationInput!): OrganizationEntity!
   updateProject(updateProjectInput: UpdateProjectInput!): ProjectEntity!
+  updateTemplate(updateTemplateInput: UpdateTemplateInput!): TemplateEntity!
   updateUser(updateUser: UpdateUserInput!): UserEntity!
 }
 
@@ -36,28 +53,71 @@ type OrganizationEntity {
   description: String!
   id: ID!
   name: String!
+  organizationUsers: [OrganizationUserEntity!]!
   projects: [ProjectEntity!]!
-  status: String!
-  users: [UserEntity!]!
+  status: OrganizationStatus!
+}
+
+input OrganizationFiltersInput {
+  userId: ID
+}
+
+"""The organization statuses"""
+enum OrganizationStatus {
+  ACTIVE
+  BLOCKED
+  DISABLE
+}
+
+type OrganizationUserEntity {
+  id: ID!
+  organization: OrganizationEntity!
+  organizationId: ID!
+  user: UserEntity!
+  userId: ID!
 }
 
 type ProjectEntity {
-  createdUserId: String!
+  createdUserId: ID!
   description: String!
   id: ID!
   name: String!
   organization: OrganizationEntity!
   organizationId: ID!
-  status: String!
+  status: ProjectStatus!
+}
+
+"""The organization statuses"""
+enum ProjectStatus {
+  ACTIVE
+  BLOCKED
+  DISABLE
 }
 
 type Query {
-  getOrganization(id: String!): OrganizationEntity!
-  getOrganizations: [OrganizationEntity!]!
-  getProject(id: String!): ProjectEntity!
-  getProjects: [ProjectEntity!]!
-  getUser(id: String!): UserEntity!
-  getUsers: [UserEntity!]!
+  organization(id: String!): OrganizationEntity!
+  organizations(filters: OrganizationFiltersInput): [OrganizationEntity!]!
+  project(id: String!): ProjectEntity!
+  projects: [ProjectEntity!]!
+  template(id: String!): TemplateEntity!
+  templates(filters: TemplateFiltersInput): [TemplateEntity!]!
+  user(id: String!): UserEntity!
+  users: [UserEntity!]!
+}
+
+type TemplateEntity {
+  cases: [CaseEntity!]!
+  createdUserId: ID!
+  description: String!
+  id: ID!
+  name: String!
+  organization: OrganizationEntity!
+  organizationId: ID!
+  user: UserEntity!
+}
+
+input TemplateFiltersInput {
+  userId: ID
 }
 
 input UpdateOrganizationInput {
@@ -67,6 +127,12 @@ input UpdateOrganizationInput {
 }
 
 input UpdateProjectInput {
+  description: String
+  id: ID!
+  name: String
+}
+
+input UpdateTemplateInput {
   description: String
   id: ID!
   name: String
@@ -84,8 +150,8 @@ type UserEntity {
   fname: String!
   id: ID!
   lname: String!
-  organizations: [OrganizationEntity!]!
   role: UserRole!
+  userOrganizations: [OrganizationUserEntity!]!
 }
 
 """The user supported roles."""

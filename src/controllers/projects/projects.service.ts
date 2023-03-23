@@ -9,7 +9,7 @@ import { UpdateProjectInput } from './inputs/update-project.input';
 export class ProjectsService {
   constructor(
     @InjectRepository(ProjectEntity)
-    private projectRepository: Repository<ProjectEntity>,
+    private readonly projectRepository: Repository<ProjectEntity>,
   ) {}
 
   public async getOne(id: string) {
@@ -20,8 +20,22 @@ export class ProjectsService {
     return await this.projectRepository.find();
   }
 
-  public async create(createProjectInput: CreateProjectInput) {
-    return await this.projectRepository.save({ ...createProjectInput });
+  public async getByOrganizationId(organizationId: string) {
+    return this.projectRepository.find({
+      where: { organizationId },
+      // take: peerPage,
+      // skip: peerPage * page,
+    });
+  }
+
+  public async create(
+    createProjectInput: CreateProjectInput,
+    createdUserId: string,
+  ) {
+    return await this.projectRepository.save({
+      ...createProjectInput,
+      createdUserId,
+    });
   }
 
   public async update(updateProjectInput: UpdateProjectInput) {

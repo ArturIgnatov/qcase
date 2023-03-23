@@ -4,6 +4,7 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class RegisterDto {
   @ApiProperty({ required: true })
+  @MinLength(3)
   @IsNotEmpty({ message: Errors.FIELD_IS_EMPTY })
   fname: string;
 

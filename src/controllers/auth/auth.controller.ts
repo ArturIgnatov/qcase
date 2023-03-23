@@ -15,20 +15,24 @@ import { Request as ExpressRequest } from 'express';
 import { ApiTags, ApiBody, ApiResponse } from '@nestjs/swagger';
 import { LoginDto } from './dto/login.dto';
 import { TokenDto } from './dto/token.dto';
+import { UpdateTokenDto } from './dto/update-token.dto';
 
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @UsePipes(new ValidationPipe())
   @UseGuards(LocalAuthGuard)
   @ApiBody({ type: LoginDto })
   @ApiResponse({
     type: TokenDto,
   })
   @Post('/login')
-  private login(@Request() req: ExpressRequest & { user: UserEntity }) {
+  @UsePipes(new ValidationPipe())
+  private login(
+    @Body() loginDto: LoginDto,
+    @Request() req: ExpressRequest & { user: UserEntity },
+  ) {
     return this.authService.login(req.user);
   }
 
@@ -40,5 +44,14 @@ export class AuthController {
   @Post('/register')
   private register(@Body() registerDto: RegisterDto) {
     return this.authService.register(registerDto);
+  }
+
+  @Post('/update-token')
+  @ApiBody({ type: UpdateTokenDto })
+  private updateRefresh(
+    @Body() updateTokenDto: UpdateTokenDto,
+    @Request() req: ExpressRequest,
+  ) {
+    return;
   }
 }

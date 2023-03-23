@@ -2,19 +2,19 @@ import {
   Column,
   Entity,
   Index,
+  JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Field, ID, ObjectType } from '@nestjs/graphql';
-import { BaseEntity } from './base.entity';
-import { JoinColumn } from 'typeorm';
 import { OrganizationEntity } from './organization.entity';
-import { ProjectStatus } from '../interfaces/project-status';
+import { CaseEntity } from './case.entity';
 import { UserEntity } from './user.entity';
 
 @ObjectType()
-@Entity('projects')
-export class ProjectEntity extends BaseEntity {
+@Entity()
+export class TemplateEntity {
   @Field(() => ID)
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -36,10 +36,6 @@ export class ProjectEntity extends BaseEntity {
   @JoinColumn({ name: 'createdUserId' })
   user: UserEntity;
 
-  @Field(() => ProjectStatus)
-  @Column({ enum: ProjectStatus, default: ProjectStatus.ACTIVE })
-  status: string;
-
   @Field(() => ID)
   @Index()
   @Column('uuid', { nullable: false })
@@ -48,4 +44,7 @@ export class ProjectEntity extends BaseEntity {
   @ManyToOne(() => OrganizationEntity, { nullable: false, onDelete: 'CASCADE' })
   @JoinColumn({ name: 'organizationId' })
   organization: OrganizationEntity;
+
+  @OneToMany(() => CaseEntity, (cas) => cas.template)
+  cases: CaseEntity[];
 }

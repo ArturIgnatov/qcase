@@ -4,12 +4,14 @@ import { UserEntity } from '../../entities/user.entity';
 import { Repository } from 'typeorm';
 import { CreateUserInput } from './inputs/create-user.input';
 import { UpdateUserInput } from './inputs/update-user.input';
+import { OrganizationUserService } from '../organization-user/organization-user.service';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(UserEntity)
     private userRepository: Repository<UserEntity>,
+    private organizationUserService: OrganizationUserService,
   ) {}
 
   public async createUser(userInput: CreateUserInput) {
@@ -18,6 +20,10 @@ export class UsersService {
 
   public async getOneUser(id: string) {
     return await this.userRepository.findOneBy({ id });
+  }
+
+  public async getOrganizationUsers(userId: string) {
+    return await this.organizationUserService.getByUserId(userId);
   }
 
   public async getAllUsers() {

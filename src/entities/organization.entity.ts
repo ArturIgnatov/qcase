@@ -1,14 +1,18 @@
 import {
   Column,
   Entity,
-  ManyToMany,
+  Index,
+  JoinColumn,
+  ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Field, ID, ObjectType } from '@nestjs/graphql';
 import { BaseEntity } from './base.entity';
-import { UserEntity } from './user.entity';
 import { ProjectEntity } from './project.entity';
+import { OrganizationStatus } from '../interfaces/organization-status';
+import { OrganizationUserEntity } from './organization-user.entity';
+import { UserEntity } from './user.entity';
 
 @ObjectType()
 @Entity('organizations')
@@ -25,19 +29,25 @@ export class OrganizationEntity extends BaseEntity {
   @Column()
   description: string;
 
-  @Field()
-  @Column()
+  @Field(() => OrganizationStatus)
+  @Column({ enum: OrganizationStatus, default: OrganizationStatus.ACTIVE })
   status: string;
 
   @Field(() => ID)
-  @Column('uuid', { nullable: false })
+  @Index()
+  @Column('uuid', { nullable: true })
   createdUserId: string;
 
-  @Field(() => [UserEntity], { defaultValue: [] })
-  @ManyToMany(() => UserEntity, (user) => user.organizations, { cascade: true })
-  users: UserEntity[];
+  @ManyToOne(() => UserEntity, { nullable: false, onDelete: 'SET NULL' })
+  @JoinColumn({ name: 'createdUserId' })
+  user: UserEntity;
 
-  @Field(() => [ProjectEntity], { defaultValue: [] })
+  @OneToMany(
+    () => OrganizationUserEntity,
+    (organizationUser) => organizationUser.organization,
+  )
+  organizationUsers: OrganizationUserEntity[];
+
   @OneToMany(() => ProjectEntity, (project) => project.organization)
   projects: ProjectEntity[];
 }

@@ -1,7 +1,6 @@
 import { ConflictException, HttpException, Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from '../../entities/user.entity';
-import { Repository } from 'typeorm';
+import { DataSource } from 'typeorm';
 import { RefreshTokenEntity } from '../../entities/refresh-token.entity';
 import { RegisterDto } from './dto/register.dto';
 import { Errors } from '../../interfaces/errors';
@@ -12,21 +11,19 @@ import { LoginDto } from './dto/login.dto';
 @Injectable()
 export class AuthService {
   constructor(
-    @InjectRepository(UserEntity)
-    private readonly userRepository: Repository<UserEntity>,
-    @InjectRepository(RefreshTokenEntity)
-    private readonly refreshRepository: Repository<RefreshTokenEntity>,
+    private readonly dataSource: DataSource,
     private readonly jwtService: JwtService,
   ) {}
   async validateUser({ email, password }: LoginDto) {
-    const user = await this.userRepository
-      .createQueryBuilder()
+    const user = await this.dataSource
+      .getRepository(UserEntity)
+      .createQueryBuilder('user')
       .where('user.email = :email', { email })
       .addSelect('user.password')
       .getOne();
 
     if (!user) {
-      return new HttpException(Errors.USER_NOT_FOUND, 404);
+      throw new HttpException(Errors.USER_NOT_FOUND, 404);
     }
     const isValidPassword = await compare(password, user.password);
 
@@ -40,7 +37,7 @@ export class AuthService {
   }
 
   async register(registerDto: RegisterDto) {
-    const user = await this.userRepository.findOneBy({
+    const user = await this.dataSource.getRepository(UserEntity).findOneBy({
       email: registerDto.email,
     });
 
@@ -50,7 +47,8 @@ export class AuthService {
 
     const hashedPassword = hashSync(registerDto.password, 12);
 
-    const operation = await this.userRepository
+    const operation = await this.dataSource
+      .getRepository(UserEntity)
       .createQueryBuilder()
       .insert()
       .values({ ...registerDto, password: hashedPassword })
@@ -61,7 +59,7 @@ export class AuthService {
 
     const tokens = this.generateTokens(candidate);
 
-    await this.refreshRepository.save({
+    await this.dataSource.getRepository(RefreshTokenEntity).save({
       userId: candidate.id,
       value: tokens.refreshToken,
     });
@@ -72,7 +70,7 @@ export class AuthService {
   public async login(user: UserEntity) {
     const tokens = this.generateTokens(user);
 
-    await this.refreshRepository.save({
+    await this.dataSource.getRepository(RefreshTokenEntity).save({
       userId: user.id,
       value: tokens.refreshToken,
     });
@@ -82,7 +80,7 @@ export class AuthService {
 
   private generateTokens(user: UserEntity) {
     const accessToken = this.jwtService.sign({
-      userId: user.id,
+      id: user.id,
       role: user.role,
     });
 

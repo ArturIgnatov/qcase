@@ -1,10 +1,7 @@
 import { Field, InputType } from '@nestjs/graphql';
 
 @InputType()
-export class CreateProjectInput {
-  @Field({ nullable: false })
-  organizationId: string;
-
+export class CreateTemplateInput {
   @Field({ nullable: false })
   name: string;
 
