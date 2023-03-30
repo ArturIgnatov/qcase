@@ -34,6 +34,12 @@ input CreateProjectInput {
   organizationId: String!
 }
 
+input CreateTagInput {
+  color: String!
+  organizationId: ID!
+  title: String!
+}
+
 input CreateTemplateInput {
   description: String
   name: String!
@@ -56,16 +62,19 @@ type Mutation {
   createCase(createCaseInput: CreateCaseInput!): CaseEntity!
   createOrganization(createOrgInput: CreateOrganizationInput!): OrganizationEntity!
   createProject(createProjectInput: CreateProjectInput!): ProjectEntity!
+  createTag(createTagInput: CreateTagInput!): TagEntity!
   createTemplate(createTemplateInput: CreateTemplateInput!): TemplateEntity!
   createUser(createUser: CreateUserInput!): UserEntity!
   removeCase(id: String!): String!
   removeOrganization(id: String!): String!
   removeProject(id: String!): String!
+  removeTag(id: String!): String!
   removeTemplate(id: String!): String!
   removeUser(id: String!): String!
   updateCase(updateCaseInput: UpdateCaseInput!): CaseEntity!
   updateOrganization(updateOrgInput: UpdateOrganizationInput!): OrganizationEntity!
   updateProject(updateProjectInput: UpdateProjectInput!): ProjectEntity!
+  updateTag(a: UpdateTagInput!): TagEntity!
   updateTemplate(updateTemplateInput: UpdateTemplateInput!): TemplateEntity!
   updateUser(updateUser: UpdateUserInput!): UserEntity!
 }
@@ -129,10 +138,28 @@ type Query {
   organizations(filters: OrganizationFiltersInput): [OrganizationEntity!]!
   project(id: String!): ProjectEntity!
   projects: [ProjectEntity!]!
+  tag(id: String!): TagEntity!
+  tags(filters: TagFiltersInput!): [TagEntity!]!
   template(id: String!): TemplateEntity!
   templates(filters: TemplateFiltersInput): [TemplateEntity!]!
   user(id: String!): UserEntity!
   users: [UserEntity!]!
+}
+
+type TagEntity {
+  caseId: ID!
+  color: String!
+  createdUserId: ID!
+  id: ID!
+  organizationId: ID!
+  templateId: ID!
+  title: String!
+}
+
+input TagFiltersInput {
+  caseId: ID
+  organizationId: ID
+  templateId: ID
 }
 
 type TemplateEntity {
@@ -168,6 +195,12 @@ input UpdateProjectInput {
   description: String
   id: ID!
   name: String
+}
+
+input UpdateTagInput {
+  color: String
+  id: ID!
+  title: String
 }
 
 input UpdateTemplateInput {
