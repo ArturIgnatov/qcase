@@ -4,30 +4,26 @@ import {
   Index,
   JoinColumn,
   ManyToOne,
-  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Field, ID, ObjectType } from '@nestjs/graphql';
-import { OrganizationEntity } from './organization.entity';
+import { TemplateEntity } from './template.entity';
 import { CaseEntity } from './case.entity';
+import { OrganizationEntity } from './organization.entity';
 import { UserEntity } from './user.entity';
-import { BaseEntity } from './base.entity';
-import { TagEntity } from './tag.entity';
 
 @ObjectType()
 @Entity()
-export class TemplateEntity extends BaseEntity {
+export class TagEntity {
   @Field(() => ID)
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @Field()
-  @Column()
-  name: string;
+  title: string;
 
   @Field()
-  @Column({ default: '' })
-  description: string;
+  color: string;
 
   @Field(() => ID)
   @Index()
@@ -47,9 +43,21 @@ export class TemplateEntity extends BaseEntity {
   @JoinColumn({ name: 'organizationId' })
   organization: OrganizationEntity;
 
-  @OneToMany(() => CaseEntity, (cas) => cas.template)
-  cases: CaseEntity[];
+  @Field(() => ID)
+  @Index()
+  @Column('uuid', { nullable: true })
+  templateId: string;
 
-  @OneToMany(() => TagEntity, (tag) => tag.templateId)
-  tags: TagEntity[];
+  @ManyToOne(() => TemplateEntity, { nullable: false, onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'templateId' })
+  template: TemplateEntity;
+
+  @Field(() => ID)
+  @Index()
+  @Column('uuid', { nullable: true })
+  caseId: string;
+
+  @ManyToOne(() => CaseEntity, { nullable: false, onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'caseId' })
+  case: CaseEntity;
 }

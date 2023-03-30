@@ -9,10 +9,11 @@ import {
 import { Field, ID, ObjectType } from '@nestjs/graphql';
 import { TemplateEntity } from './template.entity';
 import { UserEntity } from './user.entity';
+import { BaseEntity } from './base.entity';
 
 @ObjectType()
 @Entity()
-export class CaseEntity {
+export class CaseEntity extends BaseEntity {
   @Field(() => ID)
   @PrimaryGeneratedColumn('uuid')
   id: string;

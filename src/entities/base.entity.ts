@@ -3,14 +3,15 @@ import {
   BaseEntity as TypeOrmBaseEntity,
   UpdateDateColumn,
 } from 'typeorm';
-import { Field } from '@nestjs/graphql';
+import { Field, ObjectType } from '@nestjs/graphql';
 
+@ObjectType()
 export class BaseEntity extends TypeOrmBaseEntity {
-  @Field()
+  @Field(() => Date)
   @CreateDateColumn()
   createdAt: string;
 
-  @Field()
+  @Field(() => Date)
   @UpdateDateColumn()
   updatedAt: string;
 }

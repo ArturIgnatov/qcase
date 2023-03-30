@@ -3,9 +3,22 @@
 # ------------------------------------------------------
 
 type CaseEntity {
+  createdAt: DateTime!
   createdUserId: ID!
   description: String!
   id: ID!
+  name: String!
+  templateId: ID!
+  updatedAt: DateTime!
+  user: UserEntity!
+}
+
+input CaseFiltersInput {
+  templateId: ID!
+}
+
+input CreateCaseInput {
+  description: String
   name: String!
   templateId: ID!
 }
@@ -24,6 +37,7 @@ input CreateProjectInput {
 input CreateTemplateInput {
   description: String
   name: String!
+  organizationId: ID!
 }
 
 input CreateUserInput {
@@ -33,15 +47,23 @@ input CreateUserInput {
   password: String!
 }
 
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
 type Mutation {
+  createCase(createCaseInput: CreateCaseInput!): CaseEntity!
   createOrganization(createOrgInput: CreateOrganizationInput!): OrganizationEntity!
   createProject(createProjectInput: CreateProjectInput!): ProjectEntity!
   createTemplate(createTemplateInput: CreateTemplateInput!): TemplateEntity!
   createUser(createUser: CreateUserInput!): UserEntity!
+  removeCase(id: String!): String!
   removeOrganization(id: String!): String!
   removeProject(id: String!): String!
   removeTemplate(id: String!): String!
   removeUser(id: String!): String!
+  updateCase(updateCaseInput: UpdateCaseInput!): CaseEntity!
   updateOrganization(updateOrgInput: UpdateOrganizationInput!): OrganizationEntity!
   updateProject(updateProjectInput: UpdateProjectInput!): ProjectEntity!
   updateTemplate(updateTemplateInput: UpdateTemplateInput!): TemplateEntity!
@@ -49,6 +71,7 @@ type Mutation {
 }
 
 type OrganizationEntity {
+  createdAt: DateTime!
   createdUserId: ID!
   description: String!
   id: ID!
@@ -56,6 +79,7 @@ type OrganizationEntity {
   organizationUsers: [OrganizationUserEntity!]!
   projects: [ProjectEntity!]!
   status: OrganizationStatus!
+  updatedAt: DateTime!
 }
 
 input OrganizationFiltersInput {
@@ -70,14 +94,17 @@ enum OrganizationStatus {
 }
 
 type OrganizationUserEntity {
+  createdAt: DateTime!
   id: ID!
   organization: OrganizationEntity!
   organizationId: ID!
+  updatedAt: DateTime!
   user: UserEntity!
   userId: ID!
 }
 
 type ProjectEntity {
+  createdAt: DateTime!
   createdUserId: ID!
   description: String!
   id: ID!
@@ -85,6 +112,7 @@ type ProjectEntity {
   organization: OrganizationEntity!
   organizationId: ID!
   status: ProjectStatus!
+  updatedAt: DateTime!
 }
 
 """The organization statuses"""
@@ -95,6 +123,8 @@ enum ProjectStatus {
 }
 
 type Query {
+  case(id: String!): CaseEntity!
+  cases(filters: CaseFiltersInput): [CaseEntity!]!
   organization(id: String!): OrganizationEntity!
   organizations(filters: OrganizationFiltersInput): [OrganizationEntity!]!
   project(id: String!): ProjectEntity!
@@ -107,17 +137,25 @@ type Query {
 
 type TemplateEntity {
   cases: [CaseEntity!]!
+  createdAt: DateTime!
   createdUserId: ID!
   description: String!
   id: ID!
   name: String!
   organization: OrganizationEntity!
   organizationId: ID!
+  updatedAt: DateTime!
   user: UserEntity!
 }
 
 input TemplateFiltersInput {
-  userId: ID
+  organizationId: ID
+}
+
+input UpdateCaseInput {
+  description: String
+  id: ID!
+  name: String!
 }
 
 input UpdateOrganizationInput {
@@ -146,11 +184,13 @@ input UpdateUserInput {
 }
 
 type UserEntity {
+  createdAt: DateTime!
   email: String!
   fname: String!
   id: ID!
   lname: String!
   role: UserRole!
+  updatedAt: DateTime!
   userOrganizations: [OrganizationUserEntity!]!
 }
 

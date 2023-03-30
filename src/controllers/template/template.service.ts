@@ -4,6 +4,7 @@ import { TemplateEntity } from '../../entities/template.entity';
 import { Repository } from 'typeorm';
 import { CreateTemplateInput } from './inputs/create-template.input';
 import { UpdateTemplateInput } from './inputs/update-template.input';
+import { TemplateFiltersInput } from './inputs/template-filters.input';
 
 @Injectable()
 export class TemplateService {
@@ -16,15 +17,13 @@ export class TemplateService {
     return this.templateRepository.findOneBy({ id });
   }
 
-  public getMany(filters?: any) {
-    const builder = this.templateRepository.createQueryBuilder('templateCase');
+  public getMany(filters?: TemplateFiltersInput | undefined) {
+    const builder = this.templateRepository.createQueryBuilder('template');
 
     if (filters?.organizationId) {
-      builder
-        .leftJoinAndSelect('template.organization', 'organization')
-        .where('organization.organizationId = :organizationId', {
-          organizationId: filters.organizationId,
-        });
+      builder.where('template.organizationId = :organizationId', {
+        organizationId: filters.organizationId,
+      });
     }
 
     return builder.getMany();
