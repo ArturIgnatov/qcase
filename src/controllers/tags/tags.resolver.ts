@@ -6,7 +6,10 @@ import { CreateTagInput } from './inputs/create-tag.input';
 import { CurrentUser } from '../../decorators/user.decorator';
 import { RequestUser } from '../../interfaces/request-user';
 import { UpdateTagInput } from './inputs/update-tag.input';
+import { UseGuards } from '@nestjs/common';
+import { JwtAuthGuard } from '../../guards/jwt-auth.guard';
 
+@UseGuards(JwtAuthGuard)
 @Resolver(() => TagEntity)
 export class TagsResolver {
   constructor(private readonly tagsService: TagsService) {}
@@ -30,7 +33,7 @@ export class TagsResolver {
   }
 
   @Mutation(() => TagEntity)
-  private updateTag(@Args('a') updateTagInput: UpdateTagInput) {
+  private updateTag(@Args('updateTagInput') updateTagInput: UpdateTagInput) {
     return this.tagsService.update(updateTagInput);
   }
 

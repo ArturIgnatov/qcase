@@ -4,6 +4,7 @@ import { ProjectEntity } from '../../entities/project.entity';
 import { Repository } from 'typeorm';
 import { CreateProjectInput } from './inputs/create-project.input';
 import { UpdateProjectInput } from './inputs/update-project.input';
+import { ProjectFiltersInput } from './inputs/project-filters.input';
 
 @Injectable()
 export class ProjectsService {
@@ -16,8 +17,16 @@ export class ProjectsService {
     return await this.projectRepository.findOneBy({ id });
   }
 
-  public async getMany() {
-    return await this.projectRepository.find();
+  public async getMany(filters: ProjectFiltersInput) {
+    const builder = this.projectRepository.createQueryBuilder('project');
+
+    if (filters?.organizationId) {
+      builder.where('project.organizationId = :organizationId', {
+        organizationId: filters.organizationId,
+      });
+    }
+
+    return builder.getMany();
   }
 
   public async getByOrganizationId(organizationId: string) {

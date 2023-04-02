@@ -11,18 +11,21 @@ import { TemplateEntity } from './template.entity';
 import { CaseEntity } from './case.entity';
 import { OrganizationEntity } from './organization.entity';
 import { UserEntity } from './user.entity';
+import { BaseEntity } from './base.entity';
 
 @ObjectType()
 @Entity()
-export class TagEntity {
+export class TagEntity extends BaseEntity {
   @Field(() => ID)
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @Field()
+  @Column()
   title: string;
 
   @Field()
+  @Column()
   color: string;
 
   @Field(() => ID)

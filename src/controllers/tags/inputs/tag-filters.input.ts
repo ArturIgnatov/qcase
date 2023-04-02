@@ -3,11 +3,11 @@ import { Field, ID, InputType } from '@nestjs/graphql';
 @InputType()
 export class TagFiltersInput {
   @Field(() => ID, { nullable: true })
-  organizationId?: string;
+  organizationId: string | undefined;
 
   @Field(() => ID, { nullable: true })
-  templateId?: string;
+  templateId: string | undefined;
 
   @Field(() => ID, { nullable: true })
-  caseId?: string;
+  caseId: string | undefined;
 }

@@ -74,7 +74,7 @@ type Mutation {
   updateCase(updateCaseInput: UpdateCaseInput!): CaseEntity!
   updateOrganization(updateOrgInput: UpdateOrganizationInput!): OrganizationEntity!
   updateProject(updateProjectInput: UpdateProjectInput!): ProjectEntity!
-  updateTag(a: UpdateTagInput!): TagEntity!
+  updateTag(updateTagInput: UpdateTagInput!): TagEntity!
   updateTemplate(updateTemplateInput: UpdateTemplateInput!): TemplateEntity!
   updateUser(updateUser: UpdateUserInput!): UserEntity!
 }
@@ -124,6 +124,10 @@ type ProjectEntity {
   updatedAt: DateTime!
 }
 
+input ProjectFiltersInput {
+  organizationId: String!
+}
+
 """The organization statuses"""
 enum ProjectStatus {
   ACTIVE
@@ -137,7 +141,7 @@ type Query {
   organization(id: String!): OrganizationEntity!
   organizations(filters: OrganizationFiltersInput): [OrganizationEntity!]!
   project(id: String!): ProjectEntity!
-  projects: [ProjectEntity!]!
+  projects(filters: ProjectFiltersInput): [ProjectEntity!]!
   tag(id: String!): TagEntity!
   tags(filters: TagFiltersInput!): [TagEntity!]!
   template(id: String!): TemplateEntity!
@@ -149,11 +153,13 @@ type Query {
 type TagEntity {
   caseId: ID!
   color: String!
+  createdAt: DateTime!
   createdUserId: ID!
   id: ID!
   organizationId: ID!
   templateId: ID!
   title: String!
+  updatedAt: DateTime!
 }
 
 input TagFiltersInput {

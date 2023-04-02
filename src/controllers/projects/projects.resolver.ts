@@ -16,6 +16,7 @@ import { CurrentUser } from '../../decorators/user.decorator';
 import { RequestUser } from '../../interfaces/request-user';
 import { OrganizationEntity } from '../../entities/organization.entity';
 import { OrganizationsService } from '../organizations/organizations.service';
+import { ProjectFiltersInput } from './inputs/project-filters.input';
 
 @Resolver(() => ProjectEntity)
 @UseGuards(JwtAuthGuard)
@@ -31,8 +32,10 @@ export class ProjectsResolver {
   }
 
   @Query(() => [ProjectEntity])
-  public projects() {
-    return this.projectService.getMany();
+  public projects(
+    @Args('filters', { nullable: true }) filters: ProjectFiltersInput,
+  ) {
+    return this.projectService.getMany(filters);
   }
 
   @ResolveField(() => OrganizationEntity)
