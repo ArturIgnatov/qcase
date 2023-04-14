@@ -10,6 +10,15 @@ export class UtilsInstance {
       return acc;
     }, {} as { [key: string]: T[] });
   }
+
+  public generateCode(tokenLength = 82) {
+    const str = 'qwertyuiopasdfghjklzxcvbnmQWERTYUIOASDFGHJKLZXCVBNM1234567890';
+    let token = '';
+    for (let index = 0; index < tokenLength; index++) {
+      token += str[Math.round(Math.random() * (str.length - 1))];
+    }
+    return token;
+  }
 }
 
 export const Utils = new UtilsInstance();

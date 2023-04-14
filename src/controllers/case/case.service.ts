@@ -5,12 +5,16 @@ import { Repository } from 'typeorm';
 import { CreateCaseInput } from './inputs/create-case.input';
 import { UpdateCaseInput } from './inputs/update-case.input';
 import { CaseFiltersInput } from './inputs/case-filters.input';
+import { TagsService } from '../tags/tags.service';
+import { StepService } from '../step/step.service';
 
 @Injectable()
 export class CaseService {
   constructor(
     @InjectRepository(CaseEntity)
     private readonly caseRepository: Repository<CaseEntity>,
+    private readonly tagsService: TagsService,
+    private readonly stepService: StepService,
   ) {}
 
   public getOne(id: string) {
@@ -29,8 +33,23 @@ export class CaseService {
     return builder.getMany();
   }
 
-  public create(createCaseInput: CreateCaseInput, createdUserId: string) {
-    return this.caseRepository.save({ ...createCaseInput, createdUserId });
+  public async create(createCaseInput: CreateCaseInput, createdUserId: string) {
+    const { steps, tagIds, ...data } = createCaseInput;
+
+    const createdCase = await this.caseRepository.save({
+      ...data,
+      createdUserId,
+    });
+
+    if (tagIds.length) {
+      await this.tagsService.relationManyBy('caseId', createdCase.id, tagIds);
+    }
+
+    if (steps.length) {
+      await this.stepService.createManyForCase(steps, createdCase.id);
+    }
+
+    return createdCase;
   }
 
   public async update(updateCaseInput: UpdateCaseInput) {

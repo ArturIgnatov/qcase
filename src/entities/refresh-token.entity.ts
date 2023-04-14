@@ -10,7 +10,7 @@ import { BaseEntity } from './base.entity';
 import { UserEntity } from './user.entity';
 import { Field, ID } from '@nestjs/graphql';
 
-@Entity()
+@Entity('refresh_token')
 export class RefreshTokenEntity extends BaseEntity {
   @Field(() => ID)
   @PrimaryGeneratedColumn('uuid')

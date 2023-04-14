@@ -16,6 +16,7 @@ import { ApiTags, ApiBody, ApiResponse } from '@nestjs/swagger';
 import { LoginDto } from './dto/login.dto';
 import { TokenDto } from './dto/token.dto';
 import { UpdateTokenDto } from './dto/update-token.dto';
+import { InviteRegisterDto } from './dto/invite-register.dto';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -44,6 +45,16 @@ export class AuthController {
   @Post('/register')
   private register(@Body() registerDto: RegisterDto) {
     return this.authService.register(registerDto);
+  }
+
+  @UsePipes(new ValidationPipe())
+  @ApiBody({ type: InviteRegisterDto })
+  @ApiResponse({
+    type: TokenDto,
+  })
+  @Post('/invite-register')
+  private inviteRegistry(@Body() inviteRegisterDto: InviteRegisterDto) {
+    return this.authService.inviteRegister(inviteRegisterDto);
   }
 
   @Post('/update-token')

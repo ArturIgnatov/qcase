@@ -10,7 +10,7 @@ import { TagFiltersInput } from './inputs/tag-filters.input';
 export class TagsService {
   constructor(
     @InjectRepository(TagEntity)
-    private readonly tagsRepository: Repository<TagEntity>,
+    public readonly tagsRepository: Repository<TagEntity>,
   ) {}
 
   public getOne(id: string) {
@@ -43,6 +43,21 @@ export class TagsService {
 
   public create(createTagInput: CreateTagInput, createdUserId: string) {
     return this.tagsRepository.save({ ...createTagInput, createdUserId });
+  }
+
+  public async relationManyBy(
+    key: 'templateId' | 'caseId',
+    id: string,
+    tagIds: string[],
+  ) {
+    await this.tagsRepository
+      .createQueryBuilder()
+      .update('tags')
+      .set({
+        [key]: id,
+      })
+      .where('id IN (:...tagIds)', { tagIds })
+      .execute();
   }
 
   public async update(updateCaseInput: UpdateTagInput) {

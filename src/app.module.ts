@@ -11,14 +11,20 @@ import { TemplateModule } from './controllers/template/template.module';
 import { GqlModule } from './gql/gql.module';
 import { CaseModule } from './controllers/case/case.module';
 import { TagsModule } from './controllers/tags/tags.module';
+import { StepModule } from './controllers/step/step.module';
+import { UserInvitesModule } from './controllers/user-invites/user-invites.module';
+import { MailerModule } from './mailer/mailer.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
     }),
+    ScheduleModule.forRoot(),
     GqlModule,
     DatabaseModule,
+    MailerModule,
     UsersModule,
     OrganizationsModule,
     OrganizationUserModule,
@@ -28,6 +34,8 @@ import { TagsModule } from './controllers/tags/tags.module';
     GqlModule,
     CaseModule,
     TagsModule,
+    StepModule,
+    UserInvitesModule,
   ],
   controllers: [AppController],
   providers: [],

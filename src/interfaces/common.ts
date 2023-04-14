@@ -1,8 +1,4 @@
-import { gqlLoaders } from '../gql/gql-loaders';
-
-type Loaders = typeof gqlLoaders;
-
-export interface MyGQLContext extends Loaders {
+export interface MyGQLContext {
   req: any;
   res: any;
 }

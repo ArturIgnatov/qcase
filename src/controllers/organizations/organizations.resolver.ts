@@ -1,6 +1,5 @@
 import {
   Args,
-  Context,
   Mutation,
   Parent,
   Query,
@@ -18,12 +17,23 @@ import { RequestUser } from '../../interfaces/request-user';
 import { OrganizationUserEntity } from '../../entities/organization-user.entity';
 import { ProjectEntity } from '../../entities/project.entity';
 import { OrganizationFiltersInput } from './inputs/organization-filters.input';
-import { MyGQLContext } from '../../interfaces/common';
+import {
+  GraphqlLoader,
+  Loader,
+  LoaderData,
+  SelectedFields,
+  SelectedFieldsResult,
+} from 'nestjs-graphql-tools';
+import { TagEntity } from '../../entities/tag.entity';
+import { DataSource, In } from 'typeorm';
 
 @UseGuards(JwtAuthGuard)
 @Resolver(() => OrganizationEntity)
 export class OrganizationsResolver {
-  constructor(private organizationService: OrganizationsService) {}
+  constructor(
+    private readonly organizationService: OrganizationsService,
+    private readonly dataSource: DataSource,
+  ) {}
 
   @Query(() => OrganizationEntity)
   private organization(@Args('id') id: string) {
@@ -32,9 +42,10 @@ export class OrganizationsResolver {
 
   @Query(() => [OrganizationEntity])
   private organizations(
+    @SelectedFields({ sqlAlias: 'organization' }) fields: SelectedFieldsResult,
     @Args('filters', { nullable: true }) filters?: OrganizationFiltersInput,
   ) {
-    return this.organizationService.getMany(filters);
+    return this.organizationService.getMany(fields, filters);
   }
 
   @ResolveField(() => [OrganizationUserEntity])
@@ -43,11 +54,22 @@ export class OrganizationsResolver {
   }
 
   @ResolveField(() => [ProjectEntity])
-  private projects(
+  @GraphqlLoader()
+  private async projects(
     @Parent() organization: OrganizationEntity,
-    @Context() ctx: MyGQLContext,
+    @Loader() loader: LoaderData<TagEntity, string>,
   ) {
-    return ctx.projectLoader.load(organization.id);
+    const projects = await this.dataSource.getRepository(ProjectEntity).find({
+      where: {
+        organizationId: In(loader.ids),
+      },
+    });
+
+    return loader.helpers.mapOneToManyRelation(
+      projects,
+      loader.ids,
+      'organizationId',
+    );
   }
 
   @Mutation(() => OrganizationEntity)

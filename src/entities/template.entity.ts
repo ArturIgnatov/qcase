@@ -13,9 +13,10 @@ import { CaseEntity } from './case.entity';
 import { UserEntity } from './user.entity';
 import { BaseEntity } from './base.entity';
 import { TagEntity } from './tag.entity';
+import { ProjectEntity } from './project.entity';
 
 @ObjectType()
-@Entity()
+@Entity('templates')
 export class TemplateEntity extends BaseEntity {
   @Field(() => ID)
   @PrimaryGeneratedColumn('uuid')
@@ -29,14 +30,23 @@ export class TemplateEntity extends BaseEntity {
   @Column({ default: '' })
   description: string;
 
-  @Field(() => ID)
+  @Field(() => ID, { nullable: true })
   @Index()
   @Column('uuid', { nullable: true })
-  createdUserId: string;
+  createdUserId: string | null;
 
-  @ManyToOne(() => UserEntity, { nullable: false, onDelete: 'SET NULL' })
+  @Field(() => ID, { nullable: true })
+  @Index()
+  @Column('uuid', { nullable: true, default: null })
+  projectId: string | null;
+
+  @ManyToOne(() => ProjectEntity, { nullable: true, onDelete: 'SET NULL' })
+  @JoinColumn({ name: 'projectId' })
+  project: ProjectEntity | null;
+
+  @ManyToOne(() => UserEntity, { nullable: true, onDelete: 'SET NULL' })
   @JoinColumn({ name: 'createdUserId' })
-  user: UserEntity;
+  user: UserEntity | null;
 
   @Field(() => ID)
   @Index()
@@ -47,7 +57,7 @@ export class TemplateEntity extends BaseEntity {
   @JoinColumn({ name: 'organizationId' })
   organization: OrganizationEntity;
 
-  @OneToMany(() => CaseEntity, (cas) => cas.template)
+  @OneToMany(() => CaseEntity, (cas) => cas.templateId)
   cases: CaseEntity[];
 
   @OneToMany(() => TagEntity, (tag) => tag.templateId)

@@ -6,8 +6,13 @@ type CaseEntity {
   createdAt: DateTime!
   createdUserId: ID!
   description: String!
+  expectedResult: String!
   id: ID!
+  importance: CaseImportance!
   name: String!
+  precondition: String!
+  steps: [StepEntity!]!
+  tags: [TagEntity!]!
   templateId: ID!
   updatedAt: DateTime!
   user: UserEntity!
@@ -17,9 +22,21 @@ input CaseFiltersInput {
   templateId: ID!
 }
 
+"""Importance status for case"""
+enum CaseImportance {
+  HIGH
+  LOW
+  MIDDLE
+}
+
 input CreateCaseInput {
   description: String
+  expectedResult: String
+  importance: CaseImportance!
   name: String!
+  precondition: String
+  steps: [String!] = []
+  tagIds: [ID!] = []
   templateId: ID!
 }
 
@@ -41,16 +58,24 @@ input CreateTagInput {
 }
 
 input CreateTemplateInput {
-  description: String
+  description: String = ""
   name: String!
   organizationId: ID!
+  projectId: ID
+  tagIds: [ID!] = []
 }
 
 input CreateUserInput {
   email: String!
   fname: String!
   lname: String
+  organizationId: ID
   password: String!
+}
+
+input CreateUserInviteInput {
+  email: String!
+  organizationId: ID!
 }
 
 """
@@ -65,6 +90,7 @@ type Mutation {
   createTag(createTagInput: CreateTagInput!): TagEntity!
   createTemplate(createTemplateInput: CreateTemplateInput!): TemplateEntity!
   createUser(createUser: CreateUserInput!): UserEntity!
+  createUserInvite(createUserInviteInput: CreateUserInviteInput!): UserInviteEntity!
   removeCase(id: String!): String!
   removeOrganization(id: String!): String!
   removeProject(id: String!): String!
@@ -112,6 +138,10 @@ type OrganizationUserEntity {
   userId: ID!
 }
 
+input OrganizationUsersInput {
+  organizationId: ID!
+}
+
 type ProjectEntity {
   createdAt: DateTime!
   createdUserId: ID!
@@ -139,6 +169,7 @@ type Query {
   case(id: String!): CaseEntity!
   cases(filters: CaseFiltersInput): [CaseEntity!]!
   organization(id: String!): OrganizationEntity!
+  organizationUsers(organizationUsersInput: OrganizationUsersInput!): [OrganizationUserEntity!]!
   organizations(filters: OrganizationFiltersInput): [OrganizationEntity!]!
   project(id: String!): ProjectEntity!
   projects(filters: ProjectFiltersInput): [ProjectEntity!]!
@@ -147,7 +178,17 @@ type Query {
   template(id: String!): TemplateEntity!
   templates(filters: TemplateFiltersInput): [TemplateEntity!]!
   user(id: String!): UserEntity!
+  userInvites(filters: UserInvitesInput): [UserInviteEntity!]!
+  userOrganizations(userOrganizationsInput: UserOrganizationsInput!): [OrganizationUserEntity!]!
   users: [UserEntity!]!
+}
+
+type StepEntity {
+  caseId: ID!
+  createdAt: DateTime!
+  id: ID!
+  title: String!
+  updatedAt: DateTime!
 }
 
 type TagEntity {
@@ -171,12 +212,15 @@ input TagFiltersInput {
 type TemplateEntity {
   cases: [CaseEntity!]!
   createdAt: DateTime!
-  createdUserId: ID!
+  createdUserId: ID
   description: String!
   id: ID!
   name: String!
   organization: OrganizationEntity!
   organizationId: ID!
+  project: ProjectEntity
+  projectId: ID
+  tags: [TagEntity!]!
   updatedAt: DateTime!
   user: UserEntity!
 }
@@ -231,6 +275,23 @@ type UserEntity {
   role: UserRole!
   updatedAt: DateTime!
   userOrganizations: [OrganizationUserEntity!]!
+}
+
+type UserInviteEntity {
+  code: String!
+  createdAt: DateTime!
+  email: String!
+  id: ID!
+  organizationId: ID!
+  updatedAt: DateTime!
+}
+
+input UserInvitesInput {
+  organizationId: ID!
+}
+
+input UserOrganizationsInput {
+  userId: ID!
 }
 
 """The user supported roles."""

@@ -10,8 +10,8 @@ import { OrganizationUserService } from '../organization-user/organization-user.
 export class UsersService {
   constructor(
     @InjectRepository(UserEntity)
-    private userRepository: Repository<UserEntity>,
-    private organizationUserService: OrganizationUserService,
+    public userRepository: Repository<UserEntity>,
+    public organizationUserService: OrganizationUserService,
   ) {}
 
   public async createUser(userInput: CreateUserInput) {

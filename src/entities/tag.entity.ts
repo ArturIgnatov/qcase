@@ -14,7 +14,7 @@ import { UserEntity } from './user.entity';
 import { BaseEntity } from './base.entity';
 
 @ObjectType()
-@Entity()
+@Entity('tags')
 export class TagEntity extends BaseEntity {
   @Field(() => ID)
   @PrimaryGeneratedColumn('uuid')
@@ -51,7 +51,7 @@ export class TagEntity extends BaseEntity {
   @Column('uuid', { nullable: true })
   templateId: string;
 
-  @ManyToOne(() => TemplateEntity, { nullable: false, onDelete: 'CASCADE' })
+  @ManyToOne(() => TemplateEntity, { nullable: false, onDelete: 'SET NULL' })
   @JoinColumn({ name: 'templateId' })
   template: TemplateEntity;
 

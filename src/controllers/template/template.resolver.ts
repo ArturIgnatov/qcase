@@ -1,6 +1,5 @@
 import {
   Args,
-  Context,
   Mutation,
   Parent,
   Query,
@@ -19,9 +18,13 @@ import { UpdateTemplateInput } from './inputs/update-template.input';
 import { UsersService } from '../users/users.service';
 import { UserEntity } from '../../entities/user.entity';
 import { CaseEntity } from '../../entities/case.entity';
-import { MyGQLContext } from '../../interfaces/common';
 import { OrganizationEntity } from '../../entities/organization.entity';
 import { OrganizationsService } from '../organizations/organizations.service';
+import { ProjectEntity } from '../../entities/project.entity';
+import { ProjectsService } from '../projects/projects.service';
+import { TagEntity } from '../../entities/tag.entity';
+import { GraphqlLoader, Loader, LoaderData } from 'nestjs-graphql-tools';
+import { DataSource, In } from 'typeorm';
 
 @UseGuards(JwtAuthGuard)
 @Resolver(() => TemplateEntity)
@@ -30,6 +33,8 @@ export class TemplateResolver {
     private readonly templateService: TemplateService,
     private readonly userService: UsersService,
     private readonly organizationsService: OrganizationsService,
+    private readonly projectService: ProjectsService,
+    private readonly dataSource: DataSource,
   ) {}
 
   @Query(() => TemplateEntity)
@@ -49,17 +54,37 @@ export class TemplateResolver {
     return this.userService.getOneUser(template.createdUserId);
   }
 
+  @ResolveField(() => ProjectEntity, { nullable: true })
+  private project(@Parent() template: TemplateEntity) {
+    return template.projectId
+      ? this.projectService.getOne(template.projectId)
+      : null;
+  }
+
   @ResolveField(() => [CaseEntity])
-  private cases(
-    @Parent() template: TemplateEntity,
-    @Context() ctx: MyGQLContext,
-  ) {
-    return ctx.casesLoader.load(template.id);
+  @GraphqlLoader()
+  private async cases(@Loader() loader: LoaderData<TemplateEntity, string>) {
+    const cases = await this.dataSource.getRepository(CaseEntity).find({
+      where: {
+        templateId: In(loader.ids),
+      },
+    });
+
+    return loader.helpers.mapOneToManyRelation(cases, loader.ids, 'templateId');
   }
 
   @ResolveField(() => OrganizationEntity)
   private organization(@Parent() template: TemplateEntity) {
     return this.organizationsService.getOne(template.organizationId);
+  }
+
+  @ResolveField(() => [TagEntity])
+  @GraphqlLoader()
+  private async tags(@Loader() loader: LoaderData<TagEntity, string>) {
+    const tags = await this.dataSource
+      .getRepository(TagEntity)
+      .find({ where: { templateId: In(loader.ids) } });
+    return loader.helpers.mapOneToManyRelation(tags, loader.ids, 'templateId');
   }
 
   @Mutation(() => TemplateEntity)

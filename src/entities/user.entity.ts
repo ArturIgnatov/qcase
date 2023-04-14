@@ -43,7 +43,7 @@ export class UserEntity extends BaseEntity {
   @OneToMany(() => OrganizationEntity, (orientation) => orientation.user)
   organizations: OrganizationEntity[];
 
-  @OneToMany(() => TemplateEntity, (tenplate) => tenplate.user)
+  @OneToMany(() => TemplateEntity, (template) => template.user)
   templates: TemplateEntity[];
 
   @OneToMany(() => CaseEntity, (cas) => cas.user)

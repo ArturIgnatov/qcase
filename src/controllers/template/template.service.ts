@@ -5,12 +5,14 @@ import { Repository } from 'typeorm';
 import { CreateTemplateInput } from './inputs/create-template.input';
 import { UpdateTemplateInput } from './inputs/update-template.input';
 import { TemplateFiltersInput } from './inputs/template-filters.input';
+import { TagsService } from '../tags/tags.service';
 
 @Injectable()
 export class TemplateService {
   constructor(
     @InjectRepository(TemplateEntity)
     private readonly templateRepository: Repository<TemplateEntity>,
+    private readonly tagsService: TagsService,
   ) {}
 
   public getOne(id: string) {
@@ -29,14 +31,21 @@ export class TemplateService {
     return builder.getMany();
   }
 
-  public create(
+  public async create(
     createTemplateInput: CreateTemplateInput,
     createdUserId: string,
   ) {
-    return this.templateRepository.save({
-      ...createTemplateInput,
+    const { tagIds, ...templateData } = createTemplateInput;
+    const template = await this.templateRepository.save({
+      ...templateData,
       createdUserId,
     });
+
+    if (tagIds?.length) {
+      await this.tagsService.relationManyBy('templateId', template.id, tagIds);
+    }
+
+    return template;
   }
 
   public async update(updateTemplateInput: UpdateTemplateInput) {

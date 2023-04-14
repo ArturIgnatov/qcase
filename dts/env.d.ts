@@ -9,6 +9,8 @@ declare global {
       JWT_EXP_IN: string;
       JWT_SECRET: string;
       REFRESH_EXP_IN: string;
+      GOOGLE_LOGIN: string;
+      GOOGLE_PASSWORD: string;
     }
   }
 }

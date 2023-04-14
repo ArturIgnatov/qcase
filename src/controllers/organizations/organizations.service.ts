@@ -6,6 +6,7 @@ import { CreateOrganizationInput } from './inputs/create-organization.input';
 import { UpdateOrganizationInput } from './inputs/update-organization.input';
 import { OrganizationUserService } from '../organization-user/organization-user.service';
 import { OrganizationFiltersInput } from './inputs/organization-filters.input';
+import { SelectedFieldsResult } from 'nestjs-graphql-tools';
 
 @Injectable()
 export class OrganizationsService {
@@ -23,8 +24,13 @@ export class OrganizationsService {
     return this.orgRepository.findOneBy({ id });
   }
 
-  public getMany(filters?: OrganizationFiltersInput | undefined) {
-    const builder = this.orgRepository.createQueryBuilder('organization');
+  public getMany(
+    fields: SelectedFieldsResult,
+    filters?: OrganizationFiltersInput | undefined,
+  ) {
+    const builder = this.orgRepository
+      .createQueryBuilder('organization')
+      .select(fields.fieldsData.fieldsString);
 
     if (filters?.userId) {
       builder

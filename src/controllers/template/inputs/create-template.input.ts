@@ -5,9 +5,15 @@ export class CreateTemplateInput {
   @Field(() => ID)
   organizationId: string;
 
-  @Field({ nullable: false })
+  @Field(() => ID, { nullable: true })
+  projectId: string | null;
+
+  @Field(() => [ID], { nullable: true, defaultValue: [] })
+  tagIds: string[];
+
+  @Field()
   name: string;
 
-  @Field({ nullable: true })
+  @Field({ nullable: true, defaultValue: '' })
   description: string;
 }

@@ -13,6 +13,7 @@ import { ProjectEntity } from './project.entity';
 import { OrganizationStatus } from '../interfaces/organization-status';
 import { OrganizationUserEntity } from './organization-user.entity';
 import { UserEntity } from './user.entity';
+import { UserInviteEntity } from './user-invite.entity';
 
 @ObjectType()
 @Entity('organizations')
@@ -50,4 +51,7 @@ export class OrganizationEntity extends BaseEntity {
 
   @OneToMany(() => ProjectEntity, (project) => project.organization)
   projects: ProjectEntity[];
+
+  @OneToMany(() => UserInviteEntity, (invite) => invite.organizationId)
+  userInvites: UserInviteEntity[];
 }

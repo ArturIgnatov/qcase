@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
-import { gqlLoaders } from './gql-loaders';
 
 @Module({
   imports: [
@@ -13,7 +12,6 @@ import { gqlLoaders } from './gql-loaders';
       context: ({ req, res }) => ({
         req,
         res,
-        ...gqlLoaders,
       }),
     }),
   ],

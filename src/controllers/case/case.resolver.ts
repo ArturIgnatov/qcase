@@ -17,6 +17,11 @@ import { UserEntity } from '../../entities/user.entity';
 import { UsersService } from '../users/users.service';
 import { UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from '../../guards/jwt-auth.guard';
+import { StepEntity } from '../../entities/st.entity';
+import { StepService } from '../step/step.service';
+import { TagEntity } from '../../entities/tag.entity';
+import { GraphqlLoader, Loader, LoaderData } from 'nestjs-graphql-tools';
+import { DataSource, In } from 'typeorm';
 
 @UseGuards(JwtAuthGuard)
 @Resolver(() => CaseEntity)
@@ -24,6 +29,8 @@ export class CaseResolver {
   constructor(
     private readonly caseService: CaseService,
     private readonly usersService: UsersService,
+    private readonly stepService: StepService,
+    private readonly dataSource: DataSource,
   ) {}
 
   @Query(() => CaseEntity)
@@ -36,6 +43,30 @@ export class CaseResolver {
     @Args('filters', { nullable: true }) filters?: CaseFiltersInput,
   ) {
     return this.caseService.getMany(filters);
+  }
+
+  @ResolveField(() => [StepEntity])
+  @GraphqlLoader()
+  async steps(@Loader() loader: LoaderData<StepEntity, string>) {
+    const steps = await this.dataSource.getRepository(StepEntity).find({
+      where: {
+        caseId: In(loader.ids),
+      },
+    });
+
+    return loader.helpers.mapOneToManyRelation(steps, loader.ids, 'caseId');
+  }
+
+  @ResolveField(() => [TagEntity])
+  @GraphqlLoader()
+  async tags(@Loader() loader: LoaderData<TagEntity, string>) {
+    const tags = await this.dataSource.getRepository(TagEntity).find({
+      where: {
+        caseId: In(loader.ids),
+      },
+    });
+
+    return loader.helpers.mapOneToManyRelation(tags, loader.ids, 'caseId');
   }
 
   @ResolveField(() => UserEntity)
