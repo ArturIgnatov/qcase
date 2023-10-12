@@ -22,9 +22,10 @@ import { OrganizationEntity } from '../../entities/organization.entity';
 import { OrganizationsService } from '../organizations/organizations.service';
 import { ProjectEntity } from '../../entities/project.entity';
 import { ProjectsService } from '../projects/projects.service';
-import { TagEntity } from '../../entities/tag.entity';
 import { GraphqlLoader, Loader, LoaderData } from 'nestjs-graphql-tools';
 import { DataSource, In } from 'typeorm';
+import { TemplateTagsEntity } from '../../entities/template-tags.entity';
+import { TemplateTagsService } from '../template-tags/template-tags.service';
 
 @UseGuards(JwtAuthGuard)
 @Resolver(() => TemplateEntity)
@@ -34,6 +35,7 @@ export class TemplateResolver {
     private readonly userService: UsersService,
     private readonly organizationsService: OrganizationsService,
     private readonly projectService: ProjectsService,
+    private readonly templateTagsService: TemplateTagsService,
     private readonly dataSource: DataSource,
   ) {}
 
@@ -50,7 +52,7 @@ export class TemplateResolver {
   }
 
   @ResolveField(() => UserEntity)
-  private user(@Parent() template: TemplateEntity) {
+  private createdUser(@Parent() template: TemplateEntity) {
     return this.userService.getOneUser(template.createdUserId);
   }
 
@@ -78,13 +80,9 @@ export class TemplateResolver {
     return this.organizationsService.getOne(template.organizationId);
   }
 
-  @ResolveField(() => [TagEntity])
-  @GraphqlLoader()
-  private async tags(@Loader() loader: LoaderData<TagEntity, string>) {
-    const tags = await this.dataSource
-      .getRepository(TagEntity)
-      .find({ where: { templateId: In(loader.ids) } });
-    return loader.helpers.mapOneToManyRelation(tags, loader.ids, 'templateId');
+  @ResolveField(() => [TemplateTagsEntity])
+  private tags(@Parent() template: TemplateEntity) {
+    return this.templateTagsService.getByTemplateId(template.id);
   }
 
   @Mutation(() => TemplateEntity)

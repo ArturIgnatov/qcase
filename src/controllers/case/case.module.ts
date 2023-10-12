@@ -6,6 +6,7 @@ import { CaseEntity } from '../../entities/case.entity';
 import { UsersModule } from '../users/users.module';
 import { TagsModule } from '../tags/tags.module';
 import { StepModule } from '../step/step.module';
+import { CaseTagsModule } from '../case-tags/case-tags.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { StepModule } from '../step/step.module';
     UsersModule,
     TagsModule,
     StepModule,
+    CaseTagsModule,
   ],
   exports: [CaseService],
   providers: [CaseService, CaseResolver],

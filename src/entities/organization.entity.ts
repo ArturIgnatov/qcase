@@ -14,6 +14,9 @@ import { OrganizationStatus } from '../interfaces/organization-status';
 import { OrganizationUserEntity } from './organization-user.entity';
 import { UserEntity } from './user.entity';
 import { UserInviteEntity } from './user-invite.entity';
+import { TestEntity } from './test.entity';
+import { TagEntity } from './tag.entity';
+import { TemplateEntity } from './template.entity';
 
 @ObjectType()
 @Entity('organizations')
@@ -49,8 +52,17 @@ export class OrganizationEntity extends BaseEntity {
   )
   organizationUsers: OrganizationUserEntity[];
 
-  @OneToMany(() => ProjectEntity, (project) => project.organization)
+  @OneToMany(() => ProjectEntity, (project) => project.organizationId)
   projects: ProjectEntity[];
+
+  @OneToMany(() => TemplateEntity, (template) => template.organizationId)
+  templates: TemplateEntity[];
+
+  @OneToMany(() => TestEntity, (test) => test.organizationId)
+  tests: TestEntity[];
+
+  @OneToMany(() => TagEntity, (tag) => tag.organizationId)
+  tags: TagEntity[];
 
   @OneToMany(() => UserInviteEntity, (invite) => invite.organizationId)
   userInvites: UserInviteEntity[];

@@ -13,6 +13,7 @@ import { OrganizationEntity } from './organization.entity';
 import { ProjectStatus } from '../interfaces/project-status';
 import { UserEntity } from './user.entity';
 import { TemplateEntity } from './template.entity';
+import { TestEntity } from './test.entity';
 
 @ObjectType()
 @Entity('projects')
@@ -53,4 +54,7 @@ export class ProjectEntity extends BaseEntity {
 
   @OneToMany(() => TemplateEntity, (template) => template.projectId)
   templates: TemplateEntity[];
+
+  @OneToMany(() => TestEntity, (test) => test.projectId)
+  tests: TestEntity[];
 }

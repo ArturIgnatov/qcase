@@ -4,7 +4,6 @@ import { BaseEntity } from './base.entity';
 import { RefreshTokenEntity } from './refresh-token.entity';
 import { UserRole } from '../interfaces/role';
 import { OrganizationUserEntity } from './organization-user.entity';
-import { OrganizationEntity } from './organization.entity';
 import { CaseEntity } from './case.entity';
 import { TemplateEntity } from './template.entity';
 
@@ -38,10 +37,7 @@ export class UserEntity extends BaseEntity {
     () => OrganizationUserEntity,
     (organizationUser) => organizationUser.user,
   )
-  organizationUsers: OrganizationUserEntity[];
-
-  @OneToMany(() => OrganizationEntity, (orientation) => orientation.user)
-  organizations: OrganizationEntity[];
+  userOrganizations: OrganizationUserEntity[];
 
   @OneToMany(() => TemplateEntity, (template) => template.user)
   templates: TemplateEntity[];

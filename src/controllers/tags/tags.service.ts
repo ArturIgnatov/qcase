@@ -46,7 +46,7 @@ export class TagsService {
   }
 
   public async relationManyBy(
-    key: 'templateId' | 'caseId',
+    key: 'templateId' | 'caseId' | 'testId',
     id: string,
     tagIds: string[],
   ) {

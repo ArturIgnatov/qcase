@@ -6,7 +6,7 @@ import { OrganizationUserEntity } from '../../entities/organization-user.entity'
 
 @Module({
   imports: [TypeOrmModule.forFeature([OrganizationUserEntity])],
-  providers: [OrganizationUserService, OrganizationUserResolver],
   exports: [OrganizationUserService],
+  providers: [OrganizationUserService, OrganizationUserResolver],
 })
 export class OrganizationUserModule {}

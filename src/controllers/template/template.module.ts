@@ -7,6 +7,7 @@ import { UsersModule } from '../users/users.module';
 import { OrganizationsModule } from '../organizations/organizations.module';
 import { ProjectsModule } from '../projects/projects.module';
 import { TagsModule } from '../tags/tags.module';
+import { TemplateTagsModule } from '../template-tags/template-tags.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { TagsModule } from '../tags/tags.module';
     OrganizationsModule,
     ProjectsModule,
     TagsModule,
+    TemplateTagsModule,
   ],
   exports: [TemplateService],
   providers: [TemplateService, TemplateResolver],

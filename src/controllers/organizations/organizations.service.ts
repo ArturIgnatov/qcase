@@ -12,8 +12,8 @@ import { SelectedFieldsResult } from 'nestjs-graphql-tools';
 export class OrganizationsService {
   constructor(
     @InjectRepository(OrganizationEntity)
-    private readonly orgRepository: Repository<OrganizationEntity>,
-    private readonly organizationUserService: OrganizationUserService,
+    public readonly orgRepository: Repository<OrganizationEntity>,
+    public readonly organizationUserService: OrganizationUserService,
   ) {}
 
   public getOne(id: string) {

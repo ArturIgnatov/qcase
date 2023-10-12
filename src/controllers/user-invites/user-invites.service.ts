@@ -1,4 +1,4 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import { ConflictException, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserInviteEntity } from '../../entities/user-invite.entity';
 import { Repository } from 'typeorm';
@@ -13,9 +13,13 @@ import { Utils } from '../../utils/utils';
 import { OrganizationsService } from '../organizations/organizations.service';
 import { Errors } from '../../interfaces/errors';
 import { UserInvitesInput } from './inputs/user-invites.input';
+import { Cron, CronExpression } from '@nestjs/schedule';
+import * as moment from 'moment';
 
 @Injectable()
 export class UserInvitesService {
+  private readonly logger = new Logger(UserInvitesService.name);
+
   constructor(
     @InjectRepository(UserInviteEntity)
     private readonly userInviteRepository: Repository<UserInviteEntity>,
@@ -56,6 +60,21 @@ export class UserInvitesService {
     const code = Utils.generateCode(32);
 
     if (user) {
+      const userOrganizations =
+        await this.organizationService.organizationUserService.getByUserId(
+          user.id,
+        );
+
+      this.logger.log('isAlreadyExists', invite);
+
+      const isAlreadyExists = userOrganizations.some(
+        (org) => org.organizationId === data.organizationId,
+      );
+
+      if (isAlreadyExists) {
+        throw new ConflictException(Errors.USER_ALREADY_EXIST_IN_ORGANIZATION);
+      }
+
       await this.mailerService.sendMail({
         from: 'QCase <q.case.service@gmail.com>',
         to: `${data.email}`,
@@ -72,5 +91,19 @@ export class UserInvitesService {
     }
 
     return this.userInviteRepository.save({ ...data, code });
+  }
+
+  // @Cron(CronExpression.EVERY_DAY_AT_3AM)
+  @Cron(CronExpression.EVERY_10_SECONDS)
+  private handleRemoveInvites() {
+    this.logger.log('Clear invite codes');
+
+    const currentDate = moment().subtract(24, 'hours').toDate();
+
+    this.userInviteRepository
+      .createQueryBuilder()
+      .delete()
+      .where('createdAt <= :currentDate', { currentDate })
+      .execute();
   }
 }

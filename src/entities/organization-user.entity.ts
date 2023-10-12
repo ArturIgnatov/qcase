@@ -24,7 +24,9 @@ export class OrganizationUserEntity extends BaseEntity {
   @Column('uuid', { nullable: false })
   userId: string;
 
-  @ManyToOne(() => UserEntity)
+  @ManyToOne(() => UserEntity, (user) => user.userOrganizations, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'userId' })
   user: UserEntity;
 
@@ -33,7 +35,11 @@ export class OrganizationUserEntity extends BaseEntity {
   @Column('uuid', { nullable: false })
   organizationId: string;
 
-  @ManyToOne(() => OrganizationEntity, { onDelete: 'CASCADE' })
+  @ManyToOne(
+    () => OrganizationEntity,
+    (organization) => organization.organizationUsers,
+    { onDelete: 'CASCADE' },
+  )
   @JoinColumn({ name: 'organizationId' })
   organization: OrganizationEntity;
 }

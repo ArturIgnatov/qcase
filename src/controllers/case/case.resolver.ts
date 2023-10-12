@@ -19,9 +19,10 @@ import { UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from '../../guards/jwt-auth.guard';
 import { StepEntity } from '../../entities/st.entity';
 import { StepService } from '../step/step.service';
-import { TagEntity } from '../../entities/tag.entity';
 import { GraphqlLoader, Loader, LoaderData } from 'nestjs-graphql-tools';
 import { DataSource, In } from 'typeorm';
+import { CaseTagsService } from '../case-tags/case-tags.service';
+import { CaseTagsEntity } from '../../entities/case-tags.entity';
 
 @UseGuards(JwtAuthGuard)
 @Resolver(() => CaseEntity)
@@ -30,6 +31,7 @@ export class CaseResolver {
     private readonly caseService: CaseService,
     private readonly usersService: UsersService,
     private readonly stepService: StepService,
+    private readonly caseTagsService: CaseTagsService,
     private readonly dataSource: DataSource,
   ) {}
 
@@ -57,21 +59,14 @@ export class CaseResolver {
     return loader.helpers.mapOneToManyRelation(steps, loader.ids, 'caseId');
   }
 
-  @ResolveField(() => [TagEntity])
-  @GraphqlLoader()
-  async tags(@Loader() loader: LoaderData<TagEntity, string>) {
-    const tags = await this.dataSource.getRepository(TagEntity).find({
-      where: {
-        caseId: In(loader.ids),
-      },
-    });
-
-    return loader.helpers.mapOneToManyRelation(tags, loader.ids, 'caseId');
+  @ResolveField(() => [CaseTagsEntity])
+  private async tags(@Parent() _case: CaseEntity) {
+    return this.caseTagsService.getByCaseId(_case.id);
   }
 
   @ResolveField(() => UserEntity)
-  private user(@Parent() caseParent: CaseEntity) {
-    return this.usersService.getOneUser(caseParent.createdUserId);
+  private user(@Parent() _case: CaseEntity) {
+    return this.usersService.getOneUser(_case.createdUserId);
   }
 
   @Mutation(() => CaseEntity)

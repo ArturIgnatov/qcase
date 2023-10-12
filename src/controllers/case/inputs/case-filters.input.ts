@@ -2,6 +2,6 @@ import { Field, ID, InputType } from '@nestjs/graphql';
 
 @InputType()
 export class CaseFiltersInput {
-  @Field(() => ID)
-  templateId: string;
+  @Field(() => [ID])
+  templateIds: string[];
 }

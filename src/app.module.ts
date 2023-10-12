@@ -15,6 +15,11 @@ import { StepModule } from './controllers/step/step.module';
 import { UserInvitesModule } from './controllers/user-invites/user-invites.module';
 import { MailerModule } from './mailer/mailer.module';
 import { ScheduleModule } from '@nestjs/schedule';
+import { TestModule } from './controllers/test/test.module';
+import { TemplateTagsModule } from './controllers/template-tags/template-tags.module';
+import { CaseTagsModule } from './controllers/case-tags/case-tags.module';
+import { TestTagsModule } from './controllers/test-tags/test-tags.module';
+import { TestCaseModule } from './controllers/test-case/test-case.module';
 
 @Module({
   imports: [
@@ -36,6 +41,11 @@ import { ScheduleModule } from '@nestjs/schedule';
     TagsModule,
     StepModule,
     UserInvitesModule,
+    TestModule,
+    TemplateTagsModule,
+    CaseTagsModule,
+    TestTagsModule,
+    TestCaseModule,
   ],
   controllers: [AppController],
   providers: [],

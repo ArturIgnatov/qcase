@@ -12,8 +12,8 @@ import { OrganizationEntity } from './organization.entity';
 import { CaseEntity } from './case.entity';
 import { UserEntity } from './user.entity';
 import { BaseEntity } from './base.entity';
-import { TagEntity } from './tag.entity';
 import { ProjectEntity } from './project.entity';
+import { TemplateTagsEntity } from './template-tags.entity';
 
 @ObjectType()
 @Entity('templates')
@@ -57,9 +57,9 @@ export class TemplateEntity extends BaseEntity {
   @JoinColumn({ name: 'organizationId' })
   organization: OrganizationEntity;
 
-  @OneToMany(() => CaseEntity, (cas) => cas.templateId)
+  @OneToMany(() => CaseEntity, (cas) => cas.template)
   cases: CaseEntity[];
 
-  @OneToMany(() => TagEntity, (tag) => tag.templateId)
-  tags: TagEntity[];
+  @OneToMany(() => TemplateTagsEntity, (tag) => tag.template)
+  templateTags: TemplateTagsEntity[];
 }

@@ -2,7 +2,7 @@ import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { UserInvitesService } from './user-invites.service';
 import { CreateUserInviteInput } from './inputs/create-user-invite.input';
 import { UserInviteEntity } from '../../entities/user-invite.entity';
-import { UseGuards } from '@nestjs/common';
+import { UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
 import { JwtAuthGuard } from '../../guards/jwt-auth.guard';
 import { UserInvitesInput } from './inputs/user-invites.input';
 
@@ -18,6 +18,7 @@ export class UserInvitesResolver {
     return this.userInviteService.getMany(filters);
   }
 
+  @UsePipes(new ValidationPipe())
   @Mutation(() => UserInviteEntity)
   public createUserInvite(
     @Args('createUserInviteInput') createUserInviteInput: CreateUserInviteInput,

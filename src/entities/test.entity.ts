@@ -12,6 +12,9 @@ import { BaseEntity } from './base.entity';
 import { TestCaseEntity } from './test-case.entity';
 import { TestStatus } from '../interfaces/test-status';
 import { UserEntity } from './user.entity';
+import { OrganizationEntity } from './organization.entity';
+import { TestTagsEntity } from './test-tags.entity';
+import { ProjectEntity } from './project.entity';
 
 @ObjectType()
 @Entity('tests')
@@ -34,6 +37,24 @@ export class TestEntity extends BaseEntity {
 
   @Field(() => ID)
   @Index()
+  @Column('uuid', { nullable: false })
+  organizationId: string;
+
+  @ManyToOne(() => OrganizationEntity, { nullable: false, onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'organizationId' })
+  organization: OrganizationEntity;
+
+  @Field(() => ID)
+  @Index()
+  @Column('uuid', { nullable: true, default: null })
+  projectId: string | null;
+
+  @ManyToOne(() => ProjectEntity, { nullable: true, onDelete: 'SET NULL' })
+  @JoinColumn({ name: 'projectId' })
+  project: ProjectEntity | null;
+
+  @Field(() => ID)
+  @Index()
   @Column('uuid', { nullable: true })
   createdUserId: string;
 
@@ -41,16 +62,16 @@ export class TestEntity extends BaseEntity {
   @JoinColumn({ name: 'createdUserId' })
   user: UserEntity;
 
-  @Field(() => ID)
+  @Field(() => ID, { nullable: false, description: 'User ID responsible' })
   @Index()
   @Column('uuid', { nullable: true })
-  responsibleId: UserEntity;
+  responsibleId: string;
 
-  @ManyToOne(() => UserEntity, { nullable: true, onDelete: 'SET NULL' })
+  @ManyToOne(() => UserEntity, { nullable: false, onDelete: 'SET NULL' })
   @JoinColumn({ name: 'responsibleId' })
   responsible: UserEntity;
 
-  @Field(() => ID)
+  @Field(() => ID, { description: 'User ID executor' })
   @Index()
   @Column('uuid', { nullable: true })
   executorId: string;
@@ -61,4 +82,7 @@ export class TestEntity extends BaseEntity {
 
   @OneToMany(() => TestCaseEntity, (testCase) => testCase.testId)
   testCases: TestCaseEntity[];
+
+  @OneToMany(() => TestTagsEntity, (testTags) => testTags.test)
+  testTags: TestTagsEntity[];
 }

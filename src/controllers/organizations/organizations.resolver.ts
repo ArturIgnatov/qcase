@@ -26,6 +26,8 @@ import {
 } from 'nestjs-graphql-tools';
 import { TagEntity } from '../../entities/tag.entity';
 import { DataSource, In } from 'typeorm';
+import { TestEntity } from '../../entities/test.entity';
+import * as process from 'process';
 
 @UseGuards(JwtAuthGuard)
 @Resolver(() => OrganizationEntity)
@@ -57,7 +59,7 @@ export class OrganizationsResolver {
   @GraphqlLoader()
   private async projects(
     @Parent() organization: OrganizationEntity,
-    @Loader() loader: LoaderData<TagEntity, string>,
+    @Loader() loader: LoaderData<ProjectEntity, string>,
   ) {
     const projects = await this.dataSource.getRepository(ProjectEntity).find({
       where: {
@@ -67,6 +69,43 @@ export class OrganizationsResolver {
 
     return loader.helpers.mapOneToManyRelation(
       projects,
+      loader.ids,
+      'organizationId',
+    );
+  }
+
+  @ResolveField(() => [TestEntity])
+  @GraphqlLoader()
+  private async tests(
+    @Parent() organization: OrganizationEntity,
+    @Loader() loader: LoaderData<TestEntity, string>,
+  ) {
+    const tests = await this.dataSource.getRepository(TestEntity).find({
+      where: {
+        organizationId: In(loader.ids),
+      },
+    });
+
+    return loader.helpers.mapOneToManyRelation(
+      tests,
+      loader.ids,
+      'organizationId',
+    );
+  }
+
+  @ResolveField(() => [TagEntity])
+  private async tags(
+    @Parent() organization: OrganizationEntity,
+    @Loader() loader: LoaderData<TagEntity, string>,
+  ) {
+    const tags = await this.dataSource.getRepository(TagEntity).find({
+      where: {
+        organizationId: In(loader.ids),
+      },
+    });
+
+    return loader.helpers.mapOneToManyRelation(
+      tags,
       loader.ids,
       'organizationId',
     );
